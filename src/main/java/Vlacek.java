@@ -24,7 +24,43 @@ public class Vlacek {
      * @param type
      */
     public void pridatVagonek(VagonekType type) {
+        Vagonek newVagonek = new Vagonek(type);
+        switch (type) {
+            case PRVNI_TRIDA:
+                lokomotiva.getNasledujici().setPredchozi(newVagonek);
+                lokomotiva.setNasledujici(newVagonek);
+                for (int i = 1; i < delka; i++) {
+                    newVagonek.setNasledujici(posledni);
+                    newVagonek.setPredchozi(lokomotiva);
+                    newVagonek.setUmisteni(i);
+                }
+                newVagonek.getNasledujici().setPredchozi(newVagonek);
+                posledni.setPredchozi(newVagonek);
+                posledni.setUmisteni(delka);
+                break;
+            case DRUHA_TRIDA:
+                if (getDelkaByType(VagonekType.PRVNI_TRIDA) == 0) {
+                    lokomotiva.setNasledujici(newVagonek);
+                    for (int i = 1; i < delka; i++) {
+                        newVagonek.setNasledujici(posledni);
+                        newVagonek.setPredchozi(lokomotiva);
+                        newVagonek.setUmisteni(i);
+                    }
+                } else if (getDelkaByType(VagonekType.PRVNI_TRIDA) > 0) {
+                    Vagonek posledniFirstClass = getLastVagonekByType(VagonekType.PRVNI_TRIDA);
+                    posledniFirstClass.getNasledujici().setPredchozi(newVagonek);
+                    for (int i = 1; i < delka; i++) {
+                        newVagonek.setNasledujici(posledni);
+                        newVagonek.setPredchozi(lokomotiva);
+                        newVagonek.setUmisteni(i);
+                    }
+                    posledni.setUmisteni(delka);
+                }
 
+                delka++;
+                break;
+
+        }
     }
 
     public Vagonek getVagonekByIndex(int index) {
@@ -45,6 +81,17 @@ public class Vlacek {
      * @return
      */
     public Vagonek getLastVagonekByType(VagonekType type) {
+        Vagonek newVagonek = new Vagonek(type);
+        switch (type){
+            case PRVNI_TRIDA:
+                for (int i = 1; i < getDelkaByType(type); i++) {
+                    newVagonek = getVagonekByIndex(i);
+                }break;
+            case DRUHA_TRIDA:
+                for (int i = 1+getDelkaByType(VagonekType.PRVNI_TRIDA); i < getDelkaByType(type) ; i++) {
+                    newVagonek = getVagonekByIndex(i);
+                }break;
+        }
         return null;
     }
 
@@ -65,7 +112,13 @@ public class Vlacek {
      * @return
      */
     public int getDelkaByType(VagonekType type) {
-        return 0;
+        int delkaTypu = 0;
+        for (int i = 1; i <= delka ; i++) {
+            if (getVagonekByIndex(i).getType() == type){
+                delkaTypu++;
+            }
+        }
+        return delkaTypu;
     }
 
     /**
