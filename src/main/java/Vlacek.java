@@ -28,36 +28,25 @@ public class Vlacek {
         switch (type) {
             case PRVNI_TRIDA:
                 lokomotiva.getNasledujici().setPredchozi(newVagonek);
+                newVagonek.setPredchozi(lokomotiva);
+                newVagonek.setNasledujici(lokomotiva.getNasledujici());
+                newVagonek.getNasledujici().setUmisteni(lokomotiva.getNasledujici().getUmisteni()+1);
+                posledni.getPredchozi().setUmisteni(posledni.getPredchozi().getUmisteni()+1);
                 lokomotiva.setNasledujici(newVagonek);
-                for (int i = 1; i < delka; i++) {
-                    newVagonek.setNasledujici(posledni);
-                    newVagonek.setPredchozi(lokomotiva);
-                    newVagonek.setUmisteni(i);
-                }
-                newVagonek.getNasledujici().setPredchozi(newVagonek);
-                posledni.setPredchozi(newVagonek);
-                posledni.setUmisteni(delka);
+                newVagonek.setUmisteni(lokomotiva.getUmisteni()+1);
+                posledni.getPredchozi().setPredchozi(newVagonek);
+                posledni.getPredchozi().setNasledujici(posledni);
+                posledni.setUmisteni(posledni.getUmisteni()+1);
+                delka++;
                 break;
             case DRUHA_TRIDA:
-                if (getDelkaByType(VagonekType.PRVNI_TRIDA) == 0) {
-                    lokomotiva.setNasledujici(newVagonek);
-                    for (int i = 1; i < delka; i++) {
-                        newVagonek.setNasledujici(posledni);
-                        newVagonek.setPredchozi(lokomotiva);
-                        newVagonek.setUmisteni(i);
-                    }
-                } else if (getDelkaByType(VagonekType.PRVNI_TRIDA) > 0) {
-                    Vagonek posledniFirstClass = getLastVagonekByType(VagonekType.PRVNI_TRIDA);
-                    posledniFirstClass.getNasledujici().setPredchozi(newVagonek);
-                    for (int i = 1; i < delka; i++) {
-                        newVagonek.setNasledujici(posledni);
-                        newVagonek.setPredchozi(lokomotiva);
-                        newVagonek.setUmisteni(i);
-                    }
-                    posledni.setUmisteni(delka);
-                }
-
+                newVagonek.setNasledujici(posledni);
+                newVagonek.setUmisteni(posledni.getPredchozi().getUmisteni() +1);
                 delka++;
+                posledni.setUmisteni(delka);
+                newVagonek.setPredchozi(posledni.getPredchozi());
+                posledni.getPredchozi().setNasledujici(newVagonek);
+                posledni.setPredchozi(newVagonek);
                 break;
 
         }
