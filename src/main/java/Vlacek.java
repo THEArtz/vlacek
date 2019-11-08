@@ -18,7 +18,8 @@ public class Vlacek {
      * Přidávejte vagonky do vlaku
      * Podmínka je že vagonek první třídy musí být vždy řazen za předchozí vagonek toho typu, pokud žádný takový není je řazen rovnou za lokomotivu
      * vagonek 2 třídy musí být vždy řazen až za poslední vagonek třídy první
-     * Poštovní vagonek musí být vždy poslední vagonek lokomotivy
+     * Poštovní vagonek je vždy za posledním vagónkem DRUHE_TRIDY
+     * Vagonky TRETI_TRIDY se vždy řadí na konec vláčku jako poslední vagonky
      * Při vkládání vagonku nezapomeňte vagonku přiřadit danou pozici ve vlaku
      * !!!!!!! POZOR !!!!!! pokud přidáváte vagonek jinak než na konec vlaku musíte všem následujícím vagonkům zvýšit jejich umístění - doporučuji si pro tento účel vytvořit privátní metodu
      * @param type
@@ -27,6 +28,7 @@ public class Vlacek {
         Vagonek newVagonek = new Vagonek(type);
         switch (type) {
             case PRVNI_TRIDA:
+                newVagonek.setType(VagonekType.PRVNI_TRIDA);
                 lokomotiva.getNasledujici().setPredchozi(newVagonek);
                 newVagonek.setPredchozi(lokomotiva);
                 newVagonek.setNasledujici(lokomotiva.getNasledujici());
@@ -40,6 +42,7 @@ public class Vlacek {
                 delka++;
                 break;
             case DRUHA_TRIDA:
+                newVagonek.setType(VagonekType.DRUHA_TRIDA);
                 newVagonek.setNasledujici(posledni);
                 newVagonek.setUmisteni(posledni.getPredchozi().getUmisteni() +1);
                 delka++;
@@ -48,7 +51,13 @@ public class Vlacek {
                 posledni.getPredchozi().setNasledujici(newVagonek);
                 posledni.setPredchozi(newVagonek);
                 break;
-
+            case JIDELNI:
+                newVagonek.setUmisteni(getLastVagonekByType(VagonekType.PRVNI_TRIDA).getUmisteni()+1);
+                newVagonek.setPredchozi(getLastVagonekByType(VagonekType.PRVNI_TRIDA));
+                newVagonek.setNasledujici(getLastVagonekByType(VagonekType.PRVNI_TRIDA).getNasledujici());
+                getLastVagonekByType(VagonekType.PRVNI_TRIDA).setNasledujici(newVagonek);
+                delka++;
+                break;
         }
     }
 
@@ -71,17 +80,14 @@ public class Vlacek {
      */
     public Vagonek getLastVagonekByType(VagonekType type) {
         Vagonek newVagonek = new Vagonek(type);
-        switch (type){
-            case PRVNI_TRIDA:
-                for (int i = 1; i < getDelkaByType(type); i++) {
-                    newVagonek = getVagonekByIndex(i);
-                }break;
-            case DRUHA_TRIDA:
-                for (int i = 1+getDelkaByType(VagonekType.PRVNI_TRIDA); i < getDelkaByType(type) ; i++) {
-                    newVagonek = getVagonekByIndex(i);
-                }break;
+        for (int i = 1; i <= delka ; i++) {
+            if (getVagonekByIndex(i).getType() == type){
+                newVagonek = getVagonekByIndex(i);
+            }
+
         }
-        return null;
+
+        return newVagonek;
     }
 
     /**
@@ -91,7 +97,6 @@ public class Vlacek {
      * pokud budu mít osobních vagonků 5 zařadím jídelní vagonek za 3 osobní vagonek
      */
     public void pridatJidelniVagonek() {
-        Vagonek jidelni = new Vagonek(VagonekType.JIDELNI);
     }
 
     /**
@@ -100,7 +105,7 @@ public class Vlacek {
      * @param type
      * @return
      */
-    public int getDelkaByType(VagonekType type) {
+    public int getPocetVagonkuByType(VagonekType type) {
         int delkaTypu = 0;
         for (int i = 1; i <= delka ; i++) {
             if (getVagonekByIndex(i).getType() == type){
